@@ -85,3 +85,30 @@ Used for executive reporting, featuring DAX measures for "Unsold Capital" and ye
 ```bash
 git clone [https://github.com/afeefshaikh/Vendor_Performance_Dashboard.git](https://github.com/afeefshaikh/Vendor_Performance_Dashboard.git)
 cd Vendor_Performance_Dashboard
+```
+**2. Install Dependencies**
+```bash
+pip install -r requirements.txt
+```
+**3. Run the ETL Pipeline (Optional) If you want to rebuild the database from raw CSVs:**
+```bash
+python ingestion_db.py
+python get_vendor_summary.py
+```
+**4. Launch the Streamlit App:**
+```bash
+streamlit run dashboard.py
+```
+
+## 📈 Dashboard Features
+* **Real-time KPI Tracking:** Monitors Revenue ($441M), Margin (38.7%), and Freight Costs.
+* **Dynamic Filtering:** Drill down by Vendor, Brand, or Inventory Status (Overstocked vs. Healthy).
+* **Interactive Visuals:**
+    * **Treemaps** for hierarchical sales data.
+    * **Scatter Plots** with quadrant analysis for identifying "Hidden Gems."
+    * **Log-Scale Charts** to analyze freight cost anomalies.
+
+---
+
+### *Author*
+**Afeef Shaikh**
