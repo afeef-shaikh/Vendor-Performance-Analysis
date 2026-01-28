@@ -1,6 +1,6 @@
-# 📊 Supply Chain & Vendor Performance Analysis
+# Supply Chain & Vendor Performance Analysis
 
-### *Optimizing Inventory Efficiency & Profitability through Data Engineering*
+### *Optimizing Inventory Efficiency & Profitability through Data Analysis*
 
 [![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://vendor-performance-analysis.streamlit.app/)
 ![Python](https://img.shields.io/badge/Python-3.11-blue?logo=python&logoColor=white)
@@ -10,7 +10,7 @@
 
 ---
 
-## 📖 Executive Summary
+## Executive Summary
 In the high-volume retail and wholesale sector, **inventory inefficiency** is a silent profit killer. This project analyzes millions of dollars in procurement data to solve critical supply chain bottlenecks: **Vendor Dependency, "Dead" Capital in Unsold Inventory, and Margin Erosion.**
 
 By building an end-to-end data pipeline (SQL -> Python -> Dashboard), this tool identifies **$18M+ in capital risk** and pinpoints "Hidden Gem" brands that are under-marketed despite high margins.
@@ -19,7 +19,7 @@ By building an end-to-end data pipeline (SQL -> Python -> Dashboard), this tool 
 
 ---
 
-## 💼 Business Problem
+## Business Problem
 Effective inventory and sales management are critical for optimizing profitability in the retail and wholesale industry. Companies need to ensure that they are not incurring losses due to inefficient pricing, poor inventory turnover, or vendor dependency. 
 
 The goal of this analysis is to:
@@ -31,7 +31,7 @@ The goal of this analysis is to:
 
 ---
 
-## 🏗️ Architecture & Project Flow
+## Architecture & Project Flow
 
 This project follows a standard Data Engineering lifecycle: **Ingestion → Storage → Processing → Visualization.**
 
@@ -47,7 +47,7 @@ This project follows a standard Data Engineering lifecycle: **Ingestion → Stor
 
 ---
 
-## 🔍 Key Insights & Findings
+## Key Insights & Findings
 
 Based on the analysis of the current fiscal period, the dashboard reveals the following critical metrics:
 
@@ -66,7 +66,7 @@ Based on the analysis of the current fiscal period, the dashboard reveals the fo
 
 ---
 
-## 📊 Dashboard Showcase
+## Dashboard Showcase
 
 ### **1. Streamlit Web App (Public)**
 The interactive tool allows Supply Chain Managers to filter by Vendor, check Stock Turnover, and analyze specific brands.
@@ -79,7 +79,7 @@ Used for executive reporting, featuring DAX measures for "Unsold Capital" and ye
 
 ---
 
-## 🛠️ How to Run Locally
+## How to Run Locally
 
 **1. Clone the Repository**
 ```bash
@@ -100,7 +100,7 @@ python get_vendor_summary.py
 streamlit run dashboard.py
 ```
 
-## 📈 Dashboard Features
+## Dashboard Features
 * **Real-time KPI Tracking:** Monitors Revenue ($441M), Margin (38.7%), and Freight Costs.
 * **Dynamic Filtering:** Drill down by Vendor, Brand, or Inventory Status (Overstocked vs. Healthy).
 * **Interactive Visuals:**
