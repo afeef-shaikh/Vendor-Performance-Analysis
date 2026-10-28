@@ -4,6 +4,7 @@ from sqlalchemy import create_engine
 import logging
 import time
 
+os.makedirs("logs", exist_ok=True)
 logging.basicConfig(
     filename="logs/ingestion_db.log",
     level=logging.DEBUG,
@@ -21,8 +22,8 @@ def load_raw_data():
     '''this function will load the CSVs as a DataFrame and ingest into db'''
     start = time.time()
     for file in os.listdir('data'):
-        if '.csv' in file:
-            df = pd.read_csv('data/'+file)
+        if file.endswith('.csv'):
+            df = pd.read_csv(os.path.join('data', file))
             logging.info(f'Ingesting {file} in db')
             ingest_db(df, file[:-4], engine)
     end=time.time()

@@ -1,6 +1,6 @@
 # Supply Chain & Vendor Performance Analysis
 
-### *Optimizing Inventory Efficiency & Profitability through Data Analysis*
+### *Finding where inventory capital is stuck across 126 vendors and 10,692 brands*
 
 [![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://vendor-performance-analysis.streamlit.app/)
 ![Python](https://img.shields.io/badge/Python-3.11-blue?logo=python&logoColor=white)
@@ -11,102 +11,138 @@
 ---
 
 ## Executive Summary
-In the high-volume retail and wholesale sector, **inventory inefficiency** is a silent profit killer. This project analyzes millions of dollars in procurement data to solve critical supply chain bottlenecks: **Vendor Dependency, "Dead" Capital in Unsold Inventory, and Margin Erosion.**
 
-By building an end-to-end data pipeline (SQL -> Python -> Dashboard), this tool identifies **$18M+ in capital risk** and pinpoints "Hidden Gem" brands that are under-marketed despite high margins.
+An end-to-end pipeline (raw CSVs → SQLite → Python → dashboard) that turns 2.4M purchase records and the matching sales and invoice data for a liquor and wine distributor into one row per vendor-brand. It answers three questions: how dependent the business is on a few vendors, where capital is tied up in slow-moving stock, and whether margins differ across brands.
 
-**🔴 Live Dashboard:** [View on Streamlit Cloud](https://vendor-performance-analysis.streamlit.app/)
+**Headline result:** **$6.9M** of inventory, at cost, sits in **2,613 slow-moving brands** that sold less than 80% of what was bought during the period. Three vendors (Martignetti, Ultra Beverage and Perfecta Wines) account for **$2.9M** of it, so reviewing reorder quantities with them first targets the most capital.
+
+**Live Dashboard:** [View on Streamlit Cloud](https://vendor-performance-analysis.streamlit.app/)
 
 ---
 
 ## Business Problem
-Effective inventory and sales management are critical for optimizing profitability in the retail and wholesale industry. Companies need to ensure that they are not incurring losses due to inefficient pricing, poor inventory turnover, or vendor dependency. 
 
-The goal of this analysis is to:
-* **Identify underperforming brands** that require promotional or pricing adjustments.
-* **Determine top vendors** contributing to sales and gross profit.
-* **Analyze the impact of bulk purchasing** on unit costs.
-* **Assess inventory turnover** to reduce holding costs and improve efficiency.
-* **Investigate the profitability variance** between high-performing and low-performing vendors.
+The analysis sets out to:
+
+- **Determine top vendors** by sales and gross profit, and how concentrated purchasing is.
+- **Find capital tied up** in stock that isn't selling.
+- **Check whether bulk purchasing** lowers unit costs.
+- **Measure freight cost** by vendor.
+- **Test whether margins differ** between top-selling and low-selling brands.
 
 ---
 
 ## Architecture & Project Flow
 
-This project follows a standard Data Engineering lifecycle: **Ingestion → Storage → Processing → Visualization.**
+The project follows a standard data engineering lifecycle: **Ingestion → Storage → Processing → Visualization.**
 
 ![Project Architecture](ProjectFlow.jpg)
 
-### **The Tech Stack**
-* **Data Ingestion:** Python (`pandas`, `os`) to parse raw CSVs (Sales, Purchases, Invoices).
-* **Data Warehousing:** **SQLite** for relational storage and SQL transformations (`sqlalchemy`).
-* **Analysis & Logic:** Python (`scipy`, `numpy`) for Hypothesis Testing (T-Tests) and Pareto Analysis.
-* **Visualization:**
-    * **Streamlit:** For the public-facing, interactive web application (deployed on Streamlit Cloud).
-    * **Power BI:** For internal stakeholder reporting (KPI Cards, DAX Measures, and Executive Summaries).
+### The Tech Stack
+
+- **Ingestion:** Python (`pandas`, `os`) loads the raw CSVs (sales, purchases, purchase prices, vendor invoices, inventory).
+- **Storage and transformation:** **SQLite** with SQL CTEs (`sqlalchemy`) builds the vendor-brand summary.
+- **Analysis:** Python (`numpy`, `scipy`) for Pareto analysis, confidence intervals and Welch's t-test.
+- **Visualization:**
+  - **Streamlit:** public, interactive web app (deployed on Streamlit Cloud).
+  - **Power BI:** stakeholder report with KPI cards and DAX measures.
 
 ---
 
 ## Key Insights & Findings
 
-Based on the analysis of the current fiscal period, the dashboard reveals the following critical metrics:
-
-| Metric | Value | Business Impact |
+| Metric | Value | What it means |
 | :--- | :--- | :--- |
-| **Total Revenue** | **$441.41M** | Solid top-line growth driven by top 10 vendors. |
-| **Gross Profit** | **$134.07M** | Healthy gross profit, but eroded by high freight costs. |
-| **Avg Margin** | **38.7%** | Strong product margins indicate good pricing power. |
-| **Freight Cost** | **$543.40M** | **CRITICAL:** Logistics costs exceed revenue (requires audit). |
-| **Capital Risk** | **$18.63M** | Cash tied up in inventory that isn't moving (Turnover < 1). |
+| **Total Revenue** | **$451.62M** | All 10,514 brands with sales |
+| **Gross Profit** | **$138.47M** | Revenue minus cost of the units actually sold |
+| **Gross Margin** | **30.7%** | Revenue-weighted |
+| **Freight Cost** | **$1.64M** | 0.51% of purchase cost; 0.36% of revenue |
+| **Slow-Moving Stock** | **$6.94M** | Unsold units at cost in brands with turnover below 0.8 |
 
-### **Strategic Discoveries**
-1.  **The "Whale" Problem (Pareto Principle):** The top 10 vendors account for ~65% of total purchase volume. A disruption with a single partner (e.g., *Martignetti Companies*) poses a major risk.
-2.  **"Hidden Gems":** We identified **198 Brands** with high profit margins (>60%) but low sales volume (<$500). Marketing these specific SKUs could boost profit without increasing procurement costs.
-3.  **Inventory Dead Weight:** Implementing a "Stop-Buy" order for vendors in the "Overstocked" category (identified in the dashboard) is recommended to free up working capital.
+### Findings
+
+1. **Vendor concentration:** the top 10 vendors supply **65.3%** of purchase dollars, and Diageo alone supplies 15.8%. A disruption at one of them would hit a large share of the range.
+2. **Inventory build-up:** purchases outran sales by **$15.6M** at cost in the brands that bought more than they sold (**$8.7M** net once brands drawing stock down are included). The actionable part is the **$6.9M** in slow-moving brands, led by Martignetti ($1.21M), Ultra Beverage ($1.00M) and Perfecta Wines ($0.69M).
+3. **Freight is not a lever:** every vendor's freight falls between **0.46% and 0.54%** of purchase cost, so it behaves like a flat charge and doesn't separate good vendors from bad ones.
+4. **Margins barely differ by sales volume:** low-selling brands average **32.7%** and top-selling brands **31.6%**. Welch's t-test finds the gap significant (p < 0.001), but it is only 1.1 points (Cohen's d = 0.14), too small to justify different pricing strategies.
+5. **No evidence of bulk discounts:** each brand has one purchase price in the data. High-volume brands are cheaper because they are cheaper products, not because they were bought in bulk.
+6. **Low-sales, high-margin brands are immaterial:** 134 brands fit the "hidden gem" profile, but together they sold $21K. One margin point on the top 10 brands is worth about $570K.
 
 ---
 
-## Dashboard Showcase
+## Data Quality: What Was Fixed
 
-### **1. Streamlit Web App (Public)**
-The interactive tool allows Supply Chain Managers to filter by Vendor, check Stock Turnover, and analyze specific brands.
-* **Features:** Real-time filtering, Dark/Light mode, Treemaps for hierarchy analysis.
-* **Link:** [vendor-performance-analysis.streamlit.app](https://vendor-performance-analysis.streamlit.app/)
+The first version of this project reported freight costs of **$543M**, more than total revenue. Tracing that number led to three errors in the pipeline, all now fixed in [`get_vendor_summary.py`](get_vendor_summary.py).
 
-### **2. Power BI Dashboard (Internal)**
-Used for executive reporting, featuring DAX measures for "Unsold Capital" and year-over-year growth tracking.
-* *File available in the repository: `Vendor Performance Dashboard.pbix`*
+| Issue | Cause | Fix | Effect |
+| :--- | :--- | :--- | :--- |
+| **Freight counted hundreds of times** | Freight exists only at vendor-invoice level. The join copied each vendor's *total* freight onto every one of its brands, then the dashboard summed across brands. | Allocate each vendor's freight to its brands by share of purchase dollars. | $543.4M → **$1.64M** |
+| **Gross profit treated unsold stock as a loss** | Gross profit was sales minus *total purchase dollars*, so any brand that bought more than it sold looked unprofitable. 1,949 brands were wrongly flagged as loss-making and filtered out. | Gross profit = sales − (units sold × unit cost). | 104 brands are truly sold below cost; margin is 30.7%, not 38.7% |
+| **Capital-at-risk formula** | Total unsold units × the *average* purchase price across all brands. | Unsold units × each brand's own purchase price. | $18.63M → **$6.94M** in slow-moving brands |
+
+Smaller fixes: the summary query now groups strictly by vendor and brand, so a brand whose name or price varies can't be split into rows that each pick up its full sales; vendors listed under two names (after a rename) are merged under one name; profit margin is left undefined instead of −∞ for brands with no sales; headline margins are revenue-weighted instead of an average of brand margins; the pipeline now writes `vendor_sales_summary.csv`, which the dashboard and notebook read.
+
+**Limitation:** unsold stock is estimated as purchases minus sales during the period, which ignores opening inventory. The raw `end_inventory` table would give exact stock on hand.
+
+---
+
+## Dashboard
+
+### Streamlit Web App
+The interactive app lets supply chain managers filter by vendor, check stock turnover and drill into brands.
+
+- **KPI row:** revenue, gross profit, gross margin, freight and slow-moving stock.
+- **Treemap:** sales by vendor and brand, colored by margin.
+- **Opportunity matrix:** sales vs. margin for each brand, tagged Standard, Slow-Moving, Below Cost, Never Sold or Hidden Gem.
+- **Slow-moving stock by vendor:** the 10 vendors with the most capital tied up.
+- **Turnover distribution** and a sortable detail table.
+
+**Link:** [vendor-performance-analysis.streamlit.app](https://vendor-performance-analysis.streamlit.app/)
+
+### Power BI
+Stakeholder report built on the same summary table: `vendor_performance.pbix`.
+
+---
+
+## Repository Contents
+
+| File | Purpose |
+| :--- | :--- |
+| `ingestion_db.py` | Loads every CSV in `data/` into `inventory.db` |
+| `get_vendor_summary.py` | Builds and cleans the vendor-brand summary, writes it to the database and `vendor_sales_summary.csv` |
+| `Exploratory Data Analysis.ipynb` | Exploration of the raw tables (needs `inventory.db`) |
+| `Vendor Performance Analysis.ipynb` | Analysis and statistical tests (runs from the CSV) |
+| `dashboard.py` | Streamlit app |
+| `vendor_sales_summary.csv` | The summary table, one row per vendor-brand |
+| `Vendor Performance Report.pdf` | Five-page written report of the findings |
 
 ---
 
 ## How to Run Locally
 
-**1. Clone the Repository**
+**1. Clone the repository**
 ```bash
-git clone [https://github.com/afeefshaikh/Vendor_Performance_Dashboard.git](https://github.com/afeefshaikh/Vendor_Performance_Dashboard.git)
-cd Vendor_Performance_Dashboard
+git clone https://github.com/afeef-shaikh/Vendor-Performance-Analysis.git
+cd Vendor-Performance-Analysis
 ```
-**2. Install Dependencies**
+
+**2. Install dependencies**
 ```bash
 pip install -r requirements.txt
 ```
-**3. Run the ETL Pipeline (Optional) If you want to rebuild the database from raw CSVs:**
-```bash
-python ingestion_db.py
-python get_vendor_summary.py
-```
-**4. Launch the Streamlit App:**
+
+**3. Launch the Streamlit app** (uses the included `vendor_sales_summary.csv`)
 ```bash
 streamlit run dashboard.py
 ```
 
-## Dashboard Features
-* **Real-time KPI Tracking:** Monitors Revenue ($441M), Margin (38.7%), and Freight Costs.
-* **Dynamic Filtering:** Drill down by Vendor, Brand, or Inventory Status (Overstocked vs. Healthy).
-* **Interactive Visuals:**
-    * **Treemaps** for hierarchical sales data.
-    * **Scatter Plots** with quadrant analysis for identifying "Hidden Gems."
-    * **Log-Scale Charts** to analyze freight cost anomalies.
+**4. Rebuild the summary from raw data (optional)**
+
+Put the raw CSVs (`purchases`, `purchase_prices`, `sales`, `vendor_invoice`, `begin_inventory`, `end_inventory`) in a `data/` folder; they are too large for the repository. Then run:
+```bash
+python ingestion_db.py
+python get_vendor_summary.py
+```
 
 ---
 
